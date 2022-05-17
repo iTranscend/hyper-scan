@@ -29,7 +29,7 @@ fn main() {
 
     // send the message to the server
     let mut msg = String::new();
-    msg.push_str("Yall fall for anytihing, kingpin you're a pin king!");
+    msg.push_str("Y'all fall for anything, kingpin, you a pin king!");
     let mut bytes_sent = 0;
     while bytes_sent < msg.len() {
         let bytes_sent_now = socket.write(&msg.as_bytes()[bytes_sent..]);
