@@ -36,7 +36,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut open_ports: Vec<u32> = vec![];
 
-    for port in opts.start_port.unwrap_or(100)..opts.end_port.unwrap_or(145) {
+    for port in opts.start_port.unwrap_or(0)..opts.end_port.unwrap_or(65535) {
         let pre_addr = format!("{}:{}", opts.host, port);
         let addr: SocketAddr = pre_addr.to_socket_addrs().unwrap().next().unwrap();
         match TcpStream::connect(&addr) {
