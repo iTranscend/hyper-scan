@@ -16,8 +16,10 @@ struct Opts {
     #[structopt(short = "t", long = "threads", help = "Number of threads to use")]
     threads: Option<NonZeroUsize>,
 
-    #[structopt(short = "sp", long = "startPort", help = "Port to start scanning from")]
-    start_port: Option<u32>,
+    #[structopt(short = "sp", long = "startPort", help = "Port to start scanning from", default_value = "1")]
+    start_port: u32,
+    #[structopt(short = "ep", long = "endPort", help = "Port to end scanning at", default_value = "65535")]
+    end_port: u32,
 
     #[structopt(short = "ep", long = "endPort", help = "Port to end scanning at")]
     end_port: Option<u32>,
@@ -36,7 +38,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut open_ports: Vec<u32> = vec![];
 
-    for port in opts.start_port.unwrap_or(0)..opts.end_port.unwrap_or(65535) {
+    for port in opts.start_port..opts.end_port {
         let pre_addr = format!("{}:{}", opts.host, port);
         let addr: SocketAddr = pre_addr.to_socket_addrs().unwrap().next().unwrap();
         match TcpStream::connect(&addr) {
