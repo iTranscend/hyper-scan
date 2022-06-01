@@ -1,9 +1,20 @@
 [package]
 name = "turbo-scanner-rs"
 version = "0.1.0"
+authors = ["Femi Bankole <llordbanks500@gmail.com>"]
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/iTranscend/turbo-scanner-rs"
+description = "Scan open ports on a host"
+categories = ["scanner", "network", "command-line-utilities"]
+keywords = ["scanner", "network", "port", "open", "multi-threaded"]
+rust-version = "1.60.0"
 
 [dependencies]
 structopt = "0.3"
+tokio = { version = "1.0", features = ["net", "time", "process", "macros", "rt", "rt-multi-thread"] }
+futures = "0.3"
+
+[[bin]]
+name = "turbo-scanner-rs"
+path = "src/main.rs"
