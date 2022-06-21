@@ -1,10 +1,15 @@
-use std::num::{NonZeroU64, NonZeroUsize};
 use futures::stream::{self, StreamExt};
+use std::num::{NonZeroU64, NonZeroUsize};
 use std::time::Instant;
 use structopt::StructOpt;
 use tokio::net::TcpStream;
 use tokio::process::Command;
 use tokio::time;
+
+struct Port {
+    num: u16,
+    open: bool,
+}
 
 #[derive(Debug, StructOpt)]
 #[structopt(name = "turbo-scanner-rs", about = "A simple TCP port scanner")]
@@ -54,8 +59,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let now = Instant::now();
     let opts = Opts::from_args();
 
-    let available_threads = std::thread::available_parallelism()?;
-    let threads = opts.threads.unwrap_or(available_threads).get();
+    let threads = match opts.threads {
+      Some(threads) => threads,
+      None => std::thread::available_parallelism()?
+    }.get();
     let timeout = opts.timeout.get();
 
     if opts.verbose {
@@ -64,27 +71,27 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!("Timeout: {:?}ms", timeout);
     }
 
-    let mut ports_to_scan: Vec<u16> = vec![];
+    let mut ports_to_scan: Vec<Port> = vec![];
 
-    for port in opts.start_port..=opts.end_port {
-        ports_to_scan.push(port);
+    for num in opts.start_port..=opts.end_port {
+        ports_to_scan.push(Port { num, open: false });
     }
 
     let mut open_ports = stream::iter(ports_to_scan)
-        .map(move |port| {
+        .map(move |mut port| {
             let host = opts.host.clone();
             async move {
-                // tokio::time::sleep(tokio::time::Duration::from_secs(3)).await;
-                println!("port: {}", port);
-                for _ in 1..=3 { // try 3 times
+                for _ in 1..=3 {
+                    // try 3 times
                     tokio::select! {
                       _ = async {
-                        if let Ok(_) = TcpStream::connect((host.as_str(), port)).await {
-                          println!("Port {} is open", port);
+                        if let Ok(_) = TcpStream::connect((host.as_str(), port.num)).await {
+                          println!("Port {} is open", port.num);
+                          port.open = true;
                         }
                       } => break,
                       _ = time::sleep(time::Duration::from_millis(timeout)) => {
-                        println!("Port {} is closed", port);
+                        println!("Port {} check timed out", port.num);
                       },
                     };
                 }
@@ -94,7 +101,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .buffer_unordered(threads);
 
     while let Some(port) = open_ports.next().await {
-        inspect_port(port).await;
+        if port.open {
+            inspect_port(port.num).await;
+        }
     }
 
     let elapsed = now.elapsed();
