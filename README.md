@@ -1,4 +1,4 @@
-# turbo-scanner-rs
+# hyper-scan
 
 A multi-threaded port scanner
 

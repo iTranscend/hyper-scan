@@ -12,7 +12,7 @@ struct Port {
 }
 
 #[derive(Debug, StructOpt)]
-#[structopt(name = "turbo-scanner-rs", about = "A simple TCP port scanner")]
+#[structopt(name = "hyper-scan", about = "A multi-threaded TCP port scanner and service detection utility.")]
 struct Opts {
     /// Host to scan
     #[structopt(short = "h", long = "host", default_value = "localhost")]
