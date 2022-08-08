@@ -7,7 +7,7 @@ license = "MIT OR Apache-2.0"
 repository = "https://github.com/iTranscend/hyper-scan"
 description = "Scan open ports on a given host"
 categories = ["scanner", "network", "command-line-utilities"]
-keywords = ["scanner", "network", "port", "open", "multi-threaded", "scan"]
+keywords = ["scanner", "network", "port", "open", "multi-threaded"]
 rust-version = "1.60.0"
 
 [dependencies]
