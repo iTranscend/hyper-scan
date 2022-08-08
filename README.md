@@ -1,10 +1,6 @@
 # hyper-scan
 
-A multi-threaded port scanner
-
-
-## Demo
-
+A multi-threaded port scanner and service detection utility.
 
 ## Installation
 
@@ -16,7 +12,7 @@ A multi-threaded port scanner
 
 ## Usage
 ```bash
-hs [host] [ports...] [options...]
+hs [-h host] [-s startPort] [-e endPort] [-j threads] [-v verbose] [-t timeout]
 ```
 
 See full help information with the `--help` flag.
