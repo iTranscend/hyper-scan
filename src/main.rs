@@ -18,7 +18,7 @@ struct Port {
 )]
 struct Opts {
     /// Host to scan
-    #[structopt(short = "h", long = "host", default_value = "localhost")]
+    #[structopt(short = "h", long = "host", default_value = "127.0.0.1")]
     host: String,
 
     /// Print verbose output
