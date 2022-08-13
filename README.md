@@ -4,7 +4,7 @@ A multi-threaded port scanner and service detection utility.
 
 ## Demo
 
-<a title="Click to view ASCII" href="https://asciinema.org/a/vYAIQHnKYaxpREgJJUVbqWtFF?autoplay=1">
+<a title="Click to view ASCII" href="https://asciinema.org/a/lo2tV34u0qddzYcd2WENUGYoC?autoplay=1">
   <img width=40% src="https://github.com/iTranscend/hyper-scan/raw/master/media/demo.gif" alt="ASCII Demo">
 </a>
 
