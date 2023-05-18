@@ -111,7 +111,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     let elapsed = now.elapsed();
-    println!("Elapsed: {:?}", elapsed);
+    println!("Time Elapsed: {:?}", elapsed);
     Ok(())
 }
 
