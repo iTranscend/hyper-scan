@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    name: Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@main
+
+      - name: Install protoc
+        run: |
+          sudo apt update
+          sudo apt install protobuf-compiler
+
+      - name: Run cargo check
+        run: cargo check --workspace --all-targets --all-features --verbose
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3
+
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+
+      - name: Install protoc
+        run: |
+          sudo apt update
+          sudo apt install protobuf-compiler
+
+      - name: Run tests
+        run: |
+          cargo test --all-features --verbose
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3
+
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+
+      - name: Check format
+        run: cargo fmt --all --check
