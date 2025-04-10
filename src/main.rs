@@ -1,4 +1,5 @@
 use futures::stream::{self, StreamExt};
+use futures::TryStreamExt;
 use std::num::{NonZeroU64, NonZeroUsize};
 use std::time::Instant;
 use structopt::StructOpt;
@@ -75,36 +76,33 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!("Timeout: {:?}ms", timeout);
     }
 
-    let mut ports_to_scan: Vec<Port> = vec![];
+    let mut open_ports = stream::iter(opts.start_port..=opts.end_port)
+        .map(move |num| {
+            let mut port = Port { num, open: false };
 
-    for num in opts.start_port..=opts.end_port {
-        ports_to_scan.push(Port { num, open: false });
-    }
-
-    let mut open_ports = stream::iter(ports_to_scan)
-        .map(move |mut port| {
             let host = opts.host.clone();
             async move {
                 // retry 3 times
                 for _ in 1..=3 {
                     tokio::select! {
-                      _ = async {
-                        if let Ok(_) = TcpStream::connect((host.as_str(), port.num)).await {
-                          println!("Port {} is open", port.num);
-                          port.open = true;
-                        }
-                      } => break,
-                      _ = time::sleep(time::Duration::from_millis(timeout)) => {
-                        println!("Port {} check timed out", port.num);
-                      },
+                        _ = async {
+                            if let Ok(_) = TcpStream::connect((host.as_str(), port.num)).await {
+                                println!("Port {} is open", port.num);
+                                port.open = true;
+                            }
+                        } => break,
+                        _ = time::sleep(time::Duration::from_millis(timeout)) => {
+                            println!("Port {} check timed out", port.num);
+                        },
                     };
                 }
                 port
             }
         })
+        .map(tokio::spawn)
         .buffer_unordered(threads);
 
-    while let Some(port) = open_ports.next().await {
+    while let Some(port) = open_ports.try_next().await? {
         if port.open {
             inspect_port(port.num).await;
         }
